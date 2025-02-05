@@ -16,11 +16,14 @@ static u64 powu64(u64 x, u64 e)
 
 int main() {
 
-	int x = 0b0100'0000'0000'0110'1100'0000'0000'0000;
+//	float f = 3.998989;
+//	int x = *(int*) &f;
+	int x = 0b0100'0000'0100'0110'1100'0000'0000'0000;
 //	int x = 0b0011'1111'1111'1110'0000'0000'0000'0000;
-	printf("glibc = %.32f\n", *(float*) &x);
+	printf("glibc = %.6f\n", *(float*) &x);
 
 	int e = ((x & (0b0111'1111'1 << 23)) >> 23) - 127;
+	printf("e = %i\n", e);
 
 	u64 a[p] = {};
 	int b = 22;
@@ -49,22 +52,30 @@ int main() {
 	// 8 : ctz % 4 == 3
 	// 6 : ctz % 4 == 0 && ctz > 0
 
+//	int tab[] = {2, 4, 8, 6};
 	int pos = e > 0 ? e % 4 : 0;
+
+	// Keep taking mod 10, and dividing by 10, and correcting for the true
+	// bit shift by knowing what the what the bit shift is without actually
+	// doing it.
 
 	int s[26] = {};
 	bool c = 0;
 	for(int i=0; i < p; ++i) {
+		printf("pos = %i, r[%i] = %i, ", pos, i, r[i]);
 		r[i] <<= pos;
 		s[i] = (r[i] + c) % 10;
 		c = (r[i] >> 1) % 10 >= 5;
 		printf("s[%i] = %i, carry = %i\n", i, s[i], c);
 	}
 
-//	printf("%li.", powu64(2, e));
-	printf("<tbd>.");
-	for(int i=p-1; i >= 0; --i)
+	printf("\n");
+	printf("e = %i\n", e);
+	printf("%li.", powu64(2, e));
+	for(int i=p-1; i >= p-6; --i)
 		printf("%i", s[i]);
 	printf("\n");
+	printf("glibc = %.6f\n", *(float*) &x);
 
 	return 0;
 }
