@@ -1,3 +1,3 @@
 #!/bin/bash
 
-gcc -std=gnu23 -Wall -Wextra -Werror -Wno-unused-function main.c -o a -lm -lc
+clang -std=c23 -Wall -Wextra -Werror -Wno-unused-function main.c -o a -lm -lc

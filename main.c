@@ -6,7 +6,7 @@ typedef uint64_t u64;
 
 #define p 22
 
-static u64 powu64(u64 x, u64 e)
+u64 powu64(u64 x, u64 e)
 {
 	u64 r = 1;
 	for (u64 i=0; i < e; ++i)
@@ -14,12 +14,15 @@ static u64 powu64(u64 x, u64 e)
 	return r;
 }
 
+void ftos(float f, char buf, int sz)
+{
+
+}
+
 int main() {
 
-	float f = 1287.06548782;
+	float f = -980.9988;
 	int x = *(int*) &f;
-//	int x = 0b0100'0000'0000'0110'1100'0000'0000'0000;
-//	int x = 0b0100'0000'0000'1110'0000'0000'0000'0000;
 	printf("glibc = %.6f\n", *(float*) &x);
 
 	int exp = ((x & (0b0111'1111'1 << 23)) >> 23) - 127;
@@ -46,9 +49,14 @@ int main() {
 
 	r[e++] = 1;
 
+	char buf[128];
+	int bp = 0;
+	if (f < 0)
+		buf[bp++] = '-';
+
 	int pos = e;
 	bool c=0;
-	if (exp >= 0)
+	if (exp >= 0) {
 		for(int i=0; i < exp; ++i) {
 			for(int j=s; j <= e; ++j) {
 				int tmp = r[j];
@@ -60,7 +68,12 @@ int main() {
 			e += r[e] > 0;
 			printf("s = %i, e = %i\n", s, e);
 		}
-	else
+		while(e-- >= pos)
+			buf[bp++] = (char) r[e] + '0';
+		buf[bp++] = '.';
+		for(int i=e; i > e-6; --i)
+			buf[bp++] = (char) r[i] + '0';
+	} else {
 		for(int i=0; i < -exp; ++i) {
 			for(int j=s; j <= e; ++j) {
 				if (r[j] % 2)
@@ -72,29 +85,18 @@ int main() {
 			e -= r[e] == 0;
 			printf("s = %i, e = %i\n", s, e);
 		}
-
-	printf("\nglibc = %.6f\n", *(float*) &x);
-
-	printf("sol   = ");
-	if (exp >= 0) {
-		while(e-- >= pos)
-			printf("%i", r[e]);
-		printf(".");
-	} else {
-		printf("0.");
+		buf[bp++] = '0';
+		buf[bp++] = '.';
 		--pos;
 		while(--pos > e)
-			printf("%i", r[pos]);
+			buf[bp++] = (char) r[pos] + '0';
+		for(int i=e; i > e-6; --i)
+			buf[bp++] = (char) r[i] + '0';
 	}
 
-	if (exp >= 0) {
-		for(int i=e; i > e-6; --i)
-			printf("%i", r[i]);
-	} else {
-		for(int i=e; i > e-6; --i)
-			printf("%i", r[i]);
-	}
 	printf("\n");
+	printf("libc = %.6f\n", *(float*) &x);
+	printf("sol  = %s\n", buf);
 
 	return 0;
 }
