@@ -16,7 +16,7 @@ static u64 powu64(u64 x, u64 e)
 
 int main() {
 
-	float f = 8.1782;
+	float f = 1287.06548782;
 	int x = *(int*) &f;
 //	int x = 0b0100'0000'0000'0110'1100'0000'0000'0000;
 //	int x = 0b0100'0000'0000'1110'0000'0000'0000'0000;
@@ -48,37 +48,52 @@ int main() {
 
 	int pos = e;
 	bool c=0;
-	for(int i=0; i < exp; ++i) {
-		for(int j=s; j <= e; ++j) {
-			int tmp = r[j];
-			r[j] = (r[j] * 2 % 10) + c;
-			c = tmp > 4;
-			printf("r[%i] = %i\n", j, r[j]);
+	if (exp >= 0)
+		for(int i=0; i < exp; ++i) {
+			for(int j=s; j <= e; ++j) {
+				int tmp = r[j];
+				r[j] = (r[j] * 2 % 10) + c;
+				c = tmp > 4;
+				printf("r[%i] = %i\n", j, r[j]);
+			}
+			s += r[s] == 0 || r[s] == 5;
+			e += r[e] > 0;
+			printf("s = %i, e = %i\n", s, e);
 		}
-		s += r[s] == 0 || r[s] == 5;
-		e += r[e] > 0;
-		printf("s = %i, e = %i\n", s, e);
-	}
-
-#if 1
-	printf("round = %i\n", r[e-8]);
-	c = r[e-8] > 4;
-	for(int i=e-7; c; ++i) {
-		int tmp = r[i];
-		r[i] += c;
-		c = tmp == 9;
-	}
-#endif
+	else
+		for(int i=0; i < -exp; ++i) {
+			for(int j=s; j <= e; ++j) {
+				if (r[j] % 2)
+					r[j-1] += 5;
+				r[j] /= 2;
+				printf("r[%i] = %i\n", j, r[j]);
+			}
+			s -= r[s-1] == 5;
+			e -= r[e] == 0;
+			printf("s = %i, e = %i\n", s, e);
+		}
 
 	printf("\nglibc = %.6f\n", *(float*) &x);
 
 	printf("sol   = ");
-	while(e-- >= pos)
-		printf("%i", r[e]);
-	printf(".");
+	if (exp >= 0) {
+		while(e-- >= pos)
+			printf("%i", r[e]);
+		printf(".");
+	} else {
+		printf("0.");
+		--pos;
+		while(--pos > e)
+			printf("%i", r[pos]);
+	}
 
-	for(int i=e; i > e-6; --i)
-		printf("%i", r[i]);
+	if (exp >= 0) {
+		for(int i=e; i > e-6; --i)
+			printf("%i", r[i]);
+	} else {
+		for(int i=e; i > e-6; --i)
+			printf("%i", r[i]);
+	}
 	printf("\n");
 
 	return 0;
